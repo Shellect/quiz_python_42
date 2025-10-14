@@ -1,0 +1,13 @@
+services:
+  web:
+    image: nginx:stable-alpine3.21-perl
+    volumes:
+      - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./public:/var/www/public
+    ports:
+      - "8080:80"
+  app:
+    build: .
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public

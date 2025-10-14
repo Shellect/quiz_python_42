@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "hellofastapi"
+version = "0.1.0"
+description = ""
+authors = ["Your name <example@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.118.0"
+uvicorn = "^0.37.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
