@@ -5,9 +5,54 @@ services:
       - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./public:/var/www/public
     ports:
-      - "8080:80"
+      - "8000:80"
+    depends_on:
+      - app
+    networks:
+      - quiz_network
+
   app:
     build: .
     volumes:
       - ./src:/app/src
       - ./public:/app/public
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - quiz_network
+
+  database:
+    image: postgres:16.10-alpine3.22
+    shm_size: 128mb
+    environment:
+      - POSTGRES_DB=quiz
+      - POSTGRES_USER=user
+    env_file:
+      - ./.docker/postgres/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d quiz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./.docker/postgres/init_scripts:/docker-entrypoint-initdb.d
+    networks:
+      - quiz_network
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - quiz_network
+
+volumes:
+  postgres_data:
+
+networks:
+  quiz_network:
+    driver: bridge
