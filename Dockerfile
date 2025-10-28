@@ -1,5 +1,4 @@
-# latest at 14.10 => 18.79mB
-FROM python:3.9.24-alpine3.22
+FROM python:3.13.9-alpine3.22
 
 RUN apk add --no-cache curl
 
