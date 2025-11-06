@@ -6,7 +6,7 @@ if "%1"=="" (
     exit /b 1
 )
 
-docker-compose exec alembic_migration alembic revision --autogenerate -m "%1"
+docker compose run --rm migration alembic revision --autogenerate -m "%1"
 if %errorlevel% equ 0 (
     echo Migrations created successfully!
 ) else (
