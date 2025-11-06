@@ -57,7 +57,7 @@ services:
       start_period: 30s
     volumes:
       - postgres_data:/var/lib/postgresql/data
-#      - ./.docker/postgres/init_scripts:/docker-entrypoint-initdb.d
+      - ./.docker/postgres/init_scripts:/docker-entrypoint-initdb.d
     networks:
       - quiz_network
 

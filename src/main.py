@@ -3,8 +3,11 @@ from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.models.entities import Question, QuestionOption
+from src.routers import auth
 
 app = FastAPI()
+
+app.include_router(auth.router)
 
 @app.get("/question")
 def get_question(db: Session = Depends(get_db)):

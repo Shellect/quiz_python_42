@@ -2,6 +2,11 @@
 import hashlib
 import os
 
+from sqlalchemy.orm import Session
+
+from src.models.entities import User
+from src.models.schemas import UserCreate
+
 
 class AuthService:
     def hash_password(self, password: str) -> str:
@@ -23,3 +28,16 @@ class AuthService:
             return computed_key == key
         except (ValueError, IndexError):
             return False
+
+    def create_user(self, db: Session, user: UserCreate):
+        hashed_password = self.hash_password(user.password)
+        db_user = User(
+            username=user.username,
+            email=user.email,
+            password_hash=hashed_password,
+            group_id=user.group_id
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user

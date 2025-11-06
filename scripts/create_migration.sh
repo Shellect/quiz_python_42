@@ -12,5 +12,4 @@ if [ $? -eq 0 ]; then
     echo "Migration created successfully!"
 else
     echo "Failed to create migration!"
-    exit 1
 fi
