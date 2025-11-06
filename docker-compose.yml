@@ -25,6 +25,7 @@ services:
       - quiz_network
 
   migration:
+    profiles: ["migration"]
     build: .
     container_name: alembic_migration
     command: alembic upgrade head

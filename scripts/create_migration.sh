@@ -7,7 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 echo "Creating migration: $1"
-docker compose run --rm migration alembic revision --autogenerate -m "$1"
+docker compose --profile migration run --rm migration alembic revision --autogenerate -m "$1"
 if [ $? -eq 0 ]; then
     echo "Migration created successfully!"
 else
