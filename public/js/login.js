@@ -1,7 +1,7 @@
 const loginForm = document.querySelector('#loginForm');
 const loginBtn = document.getElementById('loginBtn');
 const authError = document.getElementById('authError');
-const userEmail = document.getElementById('userEmail');
+const userName = document.getElementById('userName');
 const userPassword = document.getElementById('userPassword');
 
 loginForm.addEventListener('submit', async function(e) {
@@ -14,18 +14,18 @@ loginForm.addEventListener('submit', async function(e) {
     authError.innerText = '';
 
     try {
-        const response = await fetch('/api/v1/login', {
+        const response = await fetch('/api/v1/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: userEmail.value,
+                username: userName.value,
                 password: userPassword.value
             })
         });
         const data = await response.json();
-        if (data.status === 'success') {
+        if (data.username === userName.value) {
             setTimeout(() => {
                 window.location.href = 'index.html';
             });

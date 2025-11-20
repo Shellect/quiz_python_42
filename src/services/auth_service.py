@@ -1,14 +1,12 @@
 # src/service/auth_service.py
 import hashlib
 import os
-from http.client import HTTPException
 
 from sqlalchemy.orm import Session
-
 from src.database import get_db
 from src.models.entities import User
 from src.models.schemas import UserCreate, UserLogin
-from fastapi import status, Depends
+from fastapi import HTTPException, status, Depends
 
 from src.services.sessions import get_session_manager, SessionManager
 
@@ -42,7 +40,7 @@ class AuthService:
         except (ValueError, IndexError):
             return False
 
-    async def create_user(self, user: UserCreate):
+    def create_user(self, user: UserCreate):
         # check existing user
         existing_user = self.db.query(User).filter(
             (User.email == user.email) |
@@ -62,10 +60,10 @@ class AuthService:
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
-        await self.login(db_user)
+        self.login(db_user)
         return db_user
 
-    async def authenticate_user(self, user_credentials: UserLogin):
+    def authenticate_user(self, user_credentials: UserLogin):
         user = self.db.query(User).filter(
             User.username == user_credentials.username
         ).first()
@@ -78,12 +76,14 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials"
             )
-        await self.login(user)
+        self.login(user)
         return user
 
-    async def login(self, user: User):
-        await self.session_manager.update({
+    def login(self, user: User):
+        self.session_manager.update({
             "user_id": user.id,
             "username": user.username,
+            "email": user.email,
+            "is_authenticated": True,
             "is_admin": user.is_admin
         })

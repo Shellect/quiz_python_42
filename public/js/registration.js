@@ -1,6 +1,7 @@
 const loginForm = document.querySelector('#loginForm');
 const loginBtn = document.getElementById('loginBtn');
 const authError = document.getElementById('authError');
+const userName = document.getElementById('username');
 const userEmail = document.getElementById('userEmail');
 const userPassword = document.getElementById('userPassword');
 const confirmUserPassword =  document.getElementById('confirmUserPassword');
@@ -15,19 +16,20 @@ loginForm.addEventListener('submit', async function(e) {
     authError.innerText = '';
 
     try {
-        const response = await fetch('/api/v1/registration', {
+        const response = await fetch('/api/v1/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                username: userName.value,
                 email: userEmail.value,
                 password: userPassword.value,
                 confirmPassword: confirmUserPassword.value
             })
         });
         const data = await response.json();
-        if (data.status === 'success') {
+        if (data.username === userName.value) {
             setTimeout(() => {
                 window.location.href = 'index.html';
             });

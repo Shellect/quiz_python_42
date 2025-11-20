@@ -1,26 +1,20 @@
-function getCookie(name) {
-  let matches = document.cookie.match(new RegExp(
-    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-  ));
-  return matches ? decodeURIComponent(matches[1]) : null;
-}
-
-async function getUser(session_id) {
-
+async function getUser() {
+    const response = await fetch("/api/v1/auth/session_data", {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include"
+    });
+    return await response.json();
 }
 
 async function getSession() {
-    const session = getCookie('session_id');
-    if (!session) {
-        window.location.href = '/login.html';
-    } else {
-        const user = await getUser(session);
-        if (!user) {
+        const user = await getUser();
+        if (!user.session_data.is_authenticated) {
             window.location.href = '/login.html';
         } else {
             await getNextQuestion();
         }
-    }
 }
 
 

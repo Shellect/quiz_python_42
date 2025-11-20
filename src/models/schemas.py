@@ -15,4 +15,9 @@ class UserLogin(BaseModel):
 
 class UserResponse(UserBase):
     id: int
+    username: str
+    email: Optional[str] = None
+    is_authenticated: bool
+    created_at: str
+    last_activity: str
 
