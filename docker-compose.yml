@@ -21,11 +21,13 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - quiz_network
 
   migration:
-    profiles: ["migration"]
+    profiles: [ "migration" ]
     build: .
     container_name: alembic_migration
     command: alembic upgrade head
@@ -50,7 +52,7 @@ services:
     env_file:
       - ./.docker/.env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d quiz"]
+      test: [ "CMD-SHELL", "pg_isready -U user -d quiz" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -65,18 +67,32 @@ services:
     image: adminer
     ports:
       - 8080:8080
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: dracula
     networks:
       - quiz_network
 
   redis:
     image: redis:8.4-rc1-alpine3.22
+    command: redis-server --bind 0.0.0.0 --appendonly yes
     container_name: redis_session_cache
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - quiz_network
 
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   quiz_network:

@@ -10,10 +10,18 @@ from src.models.entities import User
 from src.models.schemas import UserCreate, UserLogin
 from fastapi import status, Depends
 
-from src.services.session_manager import SessionManager
+from src.services.sessions import get_session_manager, SessionManager
 
 
 class AuthService:
+    def __init__(
+            self,
+            db: Session = Depends(get_db),
+            session_manager: SessionManager = Depends(get_session_manager)
+    ):
+        self.db = db
+        self.session_manager = session_manager
+
     def hash_password(self, password: str) -> str:
         salt = os.urandom(32)
         key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100_000)
@@ -34,11 +42,11 @@ class AuthService:
         except (ValueError, IndexError):
             return False
 
-    def create_user(self, db: Session, user: UserCreate):
+    async def create_user(self, user: UserCreate):
         # check existing user
-        existing_user = db.query(User).filter(
-            User.email == user.email |
-            User.username == user.username
+        existing_user = self.db.query(User).filter(
+            (User.email == user.email) |
+            (User.username == user.username)
         ).first()
 
         if existing_user:
@@ -51,35 +59,31 @@ class AuthService:
             password_hash=hashed_password,
             group_id=user.group_id
         )
-        db.add(db_user)
-        db.commit()
-        db.refresh(db_user)
+        self.db.add(db_user)
+        self.db.commit()
+        self.db.refresh(db_user)
+        await self.login(db_user)
         return db_user
 
-    async def authenticate_user(
-            self,
-            user_credentials: UserLogin,
-            db: Session = Depends(get_db),
-            session: SessionManager = Depends(SessionManager)
-    ):
-        user = db.query(User).filter(
+    async def authenticate_user(self, user_credentials: UserLogin):
+        user = self.db.query(User).filter(
             User.username == user_credentials.username
         ).first()
 
         if not user or not self.verify_password(
-            user_credentials.password,
-            user.password
+                user_credentials.password,
+                user.password_hash
         ):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                details="Invalid credentials"
+                detail="Invalid credentials"
             )
+        await self.login(user)
+        return user
 
-        session_data = {
+    async def login(self, user: User):
+        await self.session_manager.update({
             "user_id": user.id,
             "username": user.username,
             "is_admin": user.is_admin
-        }
-
-        # TODO: replace with singletone
-        await session.create_session(session_data)
+        })
