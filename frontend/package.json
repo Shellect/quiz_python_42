@@ -1,0 +1,34 @@
+{
+  "name": "hellofastapi",
+  "version": "1.0.0",
+  "description": "Для развертывания выполните ```bash     docker compose up ```",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shellect/quiz_python_42.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Shellect/quiz_python_42/issues"
+  },
+  "homepage": "https://github.com/Shellect/quiz_python_42#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router": "^7.9.6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "sass": "^1.94.2",
+    "vite": "^7.2.4"
+  }
+}
